@@ -3,6 +3,7 @@
 echo "Installing Paz on Vagrant"
 
 checkRequiredEnvVars() {
+  [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
   [ ! -z "$DOCKER_AUTH" ] || { echo "You must set the \$DOCKER_AUTH environment variable"; exit 1; }
   [ ! -z "$DOCKER_EMAIL" ] || { echo "You must set the \$DOCKER_EMAIL environment variable"; exit 1; }
 }
@@ -24,7 +25,7 @@ checkDependencies
 destroyOldVagrantCluster
 
 mkdir .install-temp 2>/dev/null
-generateUserDataFile vagrant/user-data .install-temp/user-data $DOCKER_AUTH $DOCKER_EMAIL
+generateUserDataFile vagrant/user-data .install-temp/user-data $DOCKER_REGISTRY $DOCKER_AUTH $DOCKER_EMAIL
 createNewVagrantCluster .install-temp/user-data
 rm -rf .install-temp
 

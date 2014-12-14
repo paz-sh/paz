@@ -43,6 +43,14 @@ Currently cAdvisor is used for monitoring, and there is no centralised logging. 
 
 ## Installation
 
+You need to set up credentials for accessing the Docker hub (because at present Paz's repositories are private). Set the following environment variables:
+```
+$ export DOCKER_REGISTRY="https://index.docker.io/v1/"
+$ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="
+$ export DOCKER_EMAIL="user@example.com"
+```
+...replacing the values above with the registry URL and auth and email values that you would normally put in your `~.dockercfg` file. `DOCKER_AUTH` and `DOCKER_EMAIL` are required and `DOCKER_REGISTRY` is optional (it will default to the official Docker hub). These variables are used to write a `~/.dockercfg` file on the CoreOS hosts.
+
 ### Vagrant
 
 Clone this repository and run the following from the root directory of this repository:

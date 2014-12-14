@@ -125,7 +125,7 @@ coreos:
 write_files:
   - path: /home/core/.dockercfg
     content: |
-        {"https://index.docker.io/v1/":{"auth":"__DOCKER_AUTH__","email":"__DOCKER_EMAIL__"}}
+        {"__DOCKER_REGISTRY__":{"auth":"__DOCKER_AUTH__","email":"__DOCKER_EMAIL__"}}
   - path: /etc/paz-environment
     permissions: 0644
     content: |

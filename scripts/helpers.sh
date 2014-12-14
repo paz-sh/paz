@@ -22,8 +22,9 @@ generateUserDataFile() {
   echo
   echo "Generating user-data file from $1 -> $2"
   cp $1 $2
-  perl -i -p -e "s/__DOCKER_AUTH__/$3/" $2
-  perl -i -p -e "s/__DOCKER_EMAIL__/$4/" $2
+  perl -i -p -e "s/__DOCKER_REGISTRY__/$3/" $2
+  perl -i -p -e "s/__DOCKER_AUTH__/$4/" $2
+  perl -i -p -e "s/__DOCKER_EMAIL__/$5/" $2
 }
 
 createNewVagrantCluster() {
