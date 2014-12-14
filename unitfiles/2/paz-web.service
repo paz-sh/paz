@@ -1,0 +1,21 @@
+[Unit]
+Description=Web front-end for the paz platform.
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+User=core
+ExecStartPre=/usr/bin/docker pull lukebond/paz-web:latest
+ExecStartPre=-/bin/sh -c "docker inspect paz-web >/dev/null 2>&1 && docker rm -f paz-web || true"
+ExecStart=/bin/bash -c " \
+  domain=$(etcdctl get /paz/config/domain); \
+  /usr/bin/docker run -P \
+    -e PAZ_ORCHESTRATOR_URL=paz-orchestrator.$domain \
+    -e PAZ_ORCHESTRATOR_SOCKET=paz-orchestrator-socket.$domain \
+    --name paz-web \
+    lukebond/paz-web"
+TimeoutStartSec=60m

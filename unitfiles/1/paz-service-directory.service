@@ -1,0 +1,16 @@
+[Unit]
+Description=A catalog of services with versioned config for running as Docker containers with systemd
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+User=core
+ExecStartPre=/usr/bin/docker pull lukebond/paz-service-directory:latest
+ExecStartPre=-/bin/sh -c "docker inspect paz-service-directory >/dev/null 2>&1 && docker rm -f paz-service-directory || true"
+ExecStart=/usr/bin/docker run -P --name paz-service-directory lukebond/paz-service-directory
+ExecStop=/usr/bin/docker rm -f paz-service-directory
+TimeoutStartSec=60m

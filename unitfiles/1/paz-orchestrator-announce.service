@@ -1,0 +1,44 @@
+[Unit]
+Description=paz-orchestrator announce
+BindsTo=paz-orchestrator.service
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+Restart=always
+User=core
+EnvironmentFile=/etc/environment
+ExecStartPre=/bin/sh -c " \
+  until \
+    docker inspect -f '{{.NetworkSettings.Ports}}' paz-orchestrator > /dev/null 2>&1; \
+    do sleep 2; \
+  done; \
+  port=$(docker inspect -f '{{ index .NetworkSettings.Ports \"9000/tcp\"}}' paz-orchestrator \
+    | sed 's/.*Port://' \
+    | sed 's/].+*//'); \
+  echo Waiting for $port/tcp...; \
+  until netstat -lnt | grep :$port >/dev/null; \
+      do sleep 1; \
+  done"
+ExecStart=/bin/sh -c \
+  "portRest=$(docker inspect -f '{{ index .NetworkSettings.Ports \"9000/tcp\"}}' paz-orchestrator \
+    | sed 's/.*Port://' \
+    | sed 's/].+*//'); \
+  portSocket=$(docker inspect -f '{{ index .NetworkSettings.Ports \"1337/tcp\"}}' paz-orchestrator \
+    | sed 's/.*Port://' \
+    | sed 's/].+*//'); \
+  echo Connected to $COREOS_PRIVATE_IPV4:$portRest/tcp and $COREOS_PRIVATE_IPV4:$portSocket, publishing to etcd...; \
+  while netstat -lnt | grep :$portRest >/dev/null; \
+    do etcdctl set /paz/services/paz-orchestrator $COREOS_PRIVATE_IPV4:$portRest --ttl 60 >/dev/null \
+      && etcdctl set /paz/services/paz-orchestrator-socket $COREOS_PRIVATE_IPV4:$portSocket >/dev/null; \
+      sleep 45; \
+  done"
+ExecStop=/bin/sh -c "/usr/bin/etcdctl rm --recursive /paz/services/paz-orchestrator && /usr/bin/etcdctl rm --recursive /paz/services/paz-orchestrator-socket"
+TimeoutStartSec=60m
+
+[X-Fleet]
+X-ConditionMachineOf=paz-orchestrator.service

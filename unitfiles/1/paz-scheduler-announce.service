@@ -1,0 +1,39 @@
+[Unit]
+Description=paz-scheduler announce
+BindsTo=paz-scheduler.service
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+Restart=always
+User=core
+EnvironmentFile=/etc/environment
+ExecStartPre=/bin/sh -c " \
+  until \
+    docker inspect \
+      -f '{{range $i, $e := .NetworkSettings.Ports }}{{$p := index $e 0}}{{$p.HostPort}}{{end}}' paz-scheduler > /dev/null 2>&1; \
+    do sleep 2; \
+  done; \
+  port=$(docker inspect \
+    -f '{{range $i, $e := .NetworkSettings.Ports }}{{$p := index $e 0}}{{$p.HostPort}}{{end}}' paz-scheduler); \
+  echo Waiting for $port/tcp...; \
+  until netstat -lnt | grep :$port >/dev/null; \
+    do sleep 1; \
+  done"
+ExecStart=/bin/sh -c " \
+  port=$(docker inspect \
+    -f '{{range $i, $e := .NetworkSettings.Ports }}{{$p := index $e 0}}{{$p.HostPort}}{{end}}' paz-scheduler); \
+  echo Connected to $COREOS_PRIVATE_IPV4:$port/tcp, publishing to etcd...; \
+  while netstat -lnt | grep :$port >/dev/null; \
+    do etcdctl set /paz/services/paz-scheduler $COREOS_PRIVATE_IPV4:$port --ttl 60 >/dev/null; \
+    sleep 45; \
+  done"
+ExecStop=/usr/bin/etcdctl rm --recursive /paz/services/paz-scheduler
+TimeoutStartSec=60m
+
+[X-Fleet]
+X-ConditionMachineOf=paz-scheduler.service

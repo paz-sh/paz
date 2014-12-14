@@ -1,0 +1,152 @@
+#cloud-config
+
+coreos:
+  update:
+    reboot-strategy: off
+  etcd:
+    #generate a new token for each unique cluster from https://discovery.etcd.io/new
+    discovery: https://discovery.etcd.io/e3b1c5ddcb23632f6487dd27a2c93c4a
+    addr: $public_ipv4:4001
+    peer-addr: $public_ipv4:7001
+  fleet:
+    public-ip: $public_ipv4
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: docker.service
+      command: restart
+      content: |
+        [Unit]
+        Description=Docker Application Container Engine 
+        Documentation=http://docs.docker.io
+        After=network.target
+        [Service]
+        ExecStartPre=/bin/mount --make-rprivate /
+        # Run docker but don't have docker automatically restart
+        # containers. This is a job for systemd and unit files.
+        ExecStart=/usr/bin/docker -d -s=btrfs -r=false -H fd:// -D --dns=$private_ipv4 --dns=8.8.8.8
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: docker-tcp.socket
+      command: start
+      enable: true
+      content: |
+        [Unit]
+        Description=Docker Socket for the API
+
+        [Socket]
+        ListenStream=2375
+        Service=docker.service
+        BindIPv6Only=both
+
+        [Install]
+        WantedBy=sockets.target
+    - name: cadvisor.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=Analyzes resource usage and performance characteristics of running containers.
+        After=docker.service
+        Requires=docker.service
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        Restart=always
+        ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --detach=true google/cadvisor
+        ExecStop=/usr/bin/docker stop -t 2 google/cadvisor
+    - name: paz-dnsmasq.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=*.paz traffic will go to the private_ipv4 addr
+        After=docker.service
+        Requires=docker.service
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+
+        [Service]
+        Restart=always
+        ExecStart=/usr/bin/docker run -p $private_ipv4:53:53/udp --privileged tomgco/dnsmasq-catch paz $private_ipv4
+        ExecStop=/usr/bin/docker stop -t 2 tomgco/dnsmasq-catch
+    - name: paz-haproxy.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=paz HAProxy instance that enables service discovery.
+        After=docker.service
+        Requires=docker.service
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        User=core
+        Restart=always
+        RestartSec=5s
+        ExecStartPre=/usr/bin/docker pull lukebond/paz-haproxy:latest
+        ExecStartPre=-/bin/bash -c "docker inspect paz-haproxy >/dev/null 2>&1 && docker rm -f paz-haproxy || true"
+        ExecStart=/usr/bin/docker run -p 80:80 -p 1936:1936 -e ETCD=$private_ipv4:4001 --name paz-haproxy lukebond/paz-haproxy
+        ExecStop=/usr/bin/docker rm -f paz-haproxy
+        TimeoutStartSec=20m
+    - name: paz-pubkey-watcher.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=Watch etcd for scheduler public key changes and update authorized_hosts.
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        User=core
+        Restart=always
+        ExecStartPre=/home/core/bin/paz-pubkey-watcher.sh once
+        ExecStart=/home/core/bin/paz-pubkey-watcher.sh
+
+write_files:
+  - path: /home/core/.dockercfg
+    content: |
+        {"https://index.docker.io/v1/":{"auth":"__DOCKER_AUTH__","email":"__DOCKER_EMAIL__"}}
+  - path: /etc/paz-environment
+    permissions: 0644
+    content: |
+        PAZ_PLATFORM=vagrant
+        PAZ_DOMAIN=paz
+        PAZ_ORCHESTRATOR_DNS_DISABLED=true
+        PAZ_ORCHESTRATOR_CORS=true
+  - path: /home/core/bin/paz-pubkey-watcher.sh
+    owner: core
+    permissions: 0754
+    content: |
+        #!/bin/bash
+        set -e
+        if [[ "$1" == "once" ]]; then
+          FN=`mktemp /tmp/paz-pubkey.XXXX`
+          until etcdctl get /paz/config/scheduler/_pubkey 2>/dev/null > $FN.tmp; do sleep 2; done && base64 -d < $FN.tmp > $FN && /usr/bin/update-ssh-keys -u core -a paz-scheduler $FN
+          rm $FN $FN.tmp
+        else
+          while :; do
+            FN=`mktemp /tmp/paz-pubkey.XXXX`
+            etcdctl watch /paz/config/scheduler/_pubkey | base64 -d > $FN && /usr/bin/update-ssh-keys -u core -a paz-scheduler $FN;
+            rm $FN
+          done;
+        fi

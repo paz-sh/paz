@@ -1,0 +1,24 @@
+[Unit]
+Description=paz-scheduler: Takes apps from your paz service directory and runs them on a CoreOS cluster using fleet
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+User=core
+ExecStartPre=/usr/bin/docker pull lukebond/paz-scheduler:latest
+ExecStartPre=-/bin/bash -c "docker inspect paz-scheduler >/dev/null 2>&1 && docker rm -f paz-scheduler || true"
+ExecStart=/bin/bash -c " \
+  host_ip=$(fleetctl list-machines --no-legend | head -1 | awk '{ print $2 }'); \
+  /usr/bin/docker run -P \
+  -e PAZ_SCHEDULER_SVCDIR_URL=paz-service-directory.paz \
+  -e PAZ_SCHEDULER_SSH_HOST=$host_ip \
+  -e PAZ_SCHEDULER_GEN_KEY=true \
+  -e PAZ_SCHEDULER_ETCD_ENDPOINT=$host_ip:4001 \
+  --name paz-scheduler \
+  lukebond/paz-scheduler"
+ExecStop=/usr/bin/docker rm -f paz-scheduler
+TimeoutStartSec=60m

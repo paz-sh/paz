@@ -1,0 +1,30 @@
+[Unit]
+Description=paz-orchestrator: Main API for all paz services and monitor of services in etcd.
+After=docker.service
+Requires=docker.service
+After=etcd.service
+Requires=etcd.service
+After=fleet.service
+Requires=fleet.service
+
+[Service]
+User=core
+EnvironmentFile=/etc/paz-environment
+ExecStartPre=/usr/bin/docker pull lukebond/paz-orchestrator:latest
+ExecStartPre=/bin/bash -c "etcdctl mkdir /paz/config >/dev/null 2>&1; etcdctl set /paz/config/domain $PAZ_DOMAIN"
+ExecStartPre=-/bin/bash -c " \
+  docker inspect paz-orchestrator >/dev/null 2>&1 \
+  && docker rm -f paz-orchestrator || true"
+ExecStart=/bin/bash -c " \
+  host_ip=$(fleetctl list-machines --no-legend | head -1 | awk '{ print $2 }'); \
+  /usr/bin/docker run -P -e PAZ_ORCHESTRATOR_SVCDIR_URL=paz-service-directory.paz \
+    -e PAZ_ORCHESTRATOR_SCHEDULER_URL=paz-scheduler.paz \
+    -e PAZ_ORCHESTRATOR_ETCD_ENDPOINT=$host_ip:4001 \
+    -e PAZ_ORCHESTRATOR_DNS_EMAIL=$PAZ_DNSIMPLE_EMAIL \
+    -e PAZ_ORCHESTRATOR_DNS_APIKEY=$PAZ_DNSIMPLE_APIKEY \
+    -e PAZ_ORCHESTRATOR_DNS_DOMAIN=$PAZ_DOMAIN \
+    -e PAZ_ORCHESTRATOR_DNS_DISABLED=$PAZ_ORCHESTRATOR_DNS_DISABLED \
+    -e PAZ_ORCHESTRATOR_CORS=$PAZ_ORCHESTRATOR_CORS \
+    --name paz-orchestrator lukebond/paz-orchestrator"
+ExecStop=/usr/bin/docker rm -f paz-orchestrator
+TimeoutStartSec=60m
