@@ -12,11 +12,12 @@ checkScriptsDirExists() {
   [ -d "scripts" ] || { echo "You must run this script from the root directory of the repository"; exit 1; }
 }
 
+checkScriptsDirExists
+
 # import helper scripts
 . ./scripts/helpers.sh
 
 checkRequiredEnvVars
-checkScriptsDirExists
 checkDependencies
 
 # XXX check if Vagrant is installed
