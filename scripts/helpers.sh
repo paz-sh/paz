@@ -8,9 +8,9 @@ checkDependencies() {
 
 destroyOldVagrantCluster() {
   echo
-  echo "Checking for existing Vagrant test cluster"
+  echo "Checking for existing Vagrant cluster"
   if [ -d "coreos-vagrant" ]; then
-    echo "Deleting existing Vagrant test cluster"
+    echo "Deleting existing Vagrant cluster"
     cd coreos-vagrant
     vagrant destroy -f
     cd ..
@@ -29,7 +29,7 @@ generateUserDataFile() {
 
 createNewVagrantCluster() {
   echo
-  echo "Creating a new Vagrant test cluster"
+  echo "Creating a new Vagrant cluster"
   git clone https://github.com/coreos/coreos-vagrant/
   cp $1 coreos-vagrant
   cd coreos-vagrant
