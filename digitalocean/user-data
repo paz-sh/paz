@@ -60,7 +60,7 @@ coreos:
 
         [Service]
         Restart=always
-        ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --detach=true google/cadvisor
+        ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --name=cadvisor google/cadvisor:latest
         ExecStop=/usr/bin/docker stop -t 2 google/cadvisor
     - name: swap.service
       command: start
@@ -96,7 +96,7 @@ coreos:
 
         [Service]
         Restart=always
-        ExecStart=/usr/bin/docker run -p $private_ipv4:53:53/udp --privileged tomgco/dnsmasq-catch paz $private_ipv4
+        ExecStart=/usr/bin/docker run -p $private_ipv4:53:53/udp --privileged --name=paz-dnsmasq tomgco/dnsmasq-catch paz $private_ipv4
         ExecStop=/usr/bin/docker stop -t 2 tomgco/dnsmasq-catch
     - name: paz-haproxy.service
       runtime: true
