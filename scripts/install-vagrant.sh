@@ -33,7 +33,7 @@ rm -rf .install-temp
 configureSSHAgent
 
 ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
-export FLEETCTL_TUNNEL=127.0.0.1:2222
+export FLEETCTL_ENDPOINT=http://172.17.8.101:4001
 
 # launch all base paz units except paz-web, and wait until announced
 launchAndWaitForUnits 1 6

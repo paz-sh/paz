@@ -116,9 +116,9 @@ coreos:
         User=core
         Restart=always
         RestartSec=5s
-        ExecStartPre=/usr/bin/docker pull lukebond/paz-haproxy:latest
+        ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-haproxy:latest
         ExecStartPre=-/bin/bash -c "docker inspect paz-haproxy >/dev/null 2>&1 && docker rm -f paz-haproxy || true"
-        ExecStart=/usr/bin/docker run -p 80:80 -p 1936:1936 -e ETCD=$private_ipv4:4001 --name paz-haproxy lukebond/paz-haproxy
+        ExecStart=/usr/bin/docker run -p 80:80 -p 1936:1936 -e ETCD=$private_ipv4:4001 --name paz-haproxy quay.io/yldio/paz-haproxy
         ExecStop=/usr/bin/docker rm -f paz-haproxy
         TimeoutStartSec=20m
     - name: paz-pubkey-watcher.service

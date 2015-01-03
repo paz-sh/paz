@@ -10,7 +10,7 @@ Requires=fleet.service
 [Service]
 User=core
 EnvironmentFile=/etc/paz-environment
-ExecStartPre=/usr/bin/docker pull lukebond/paz-orchestrator:latest
+ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-orchestrator:latest
 ExecStartPre=/bin/bash -c "etcdctl mkdir /paz/config >/dev/null 2>&1; etcdctl set /paz/config/domain $PAZ_DOMAIN"
 ExecStartPre=-/bin/bash -c " \
   docker inspect paz-orchestrator >/dev/null 2>&1 \
@@ -25,6 +25,6 @@ ExecStart=/bin/bash -c " \
     -e PAZ_ORCHESTRATOR_DNS_DOMAIN=$PAZ_DOMAIN \
     -e PAZ_ORCHESTRATOR_DNS_DISABLED=$PAZ_ORCHESTRATOR_DNS_DISABLED \
     -e PAZ_ORCHESTRATOR_CORS=$PAZ_ORCHESTRATOR_CORS \
-    --name paz-orchestrator lukebond/paz-orchestrator"
+    --name paz-orchestrator quay.io/yldio/paz-orchestrator"
 ExecStop=/usr/bin/docker rm -f paz-orchestrator
 TimeoutStartSec=60m

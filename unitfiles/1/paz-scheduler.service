@@ -9,7 +9,7 @@ Requires=fleet.service
 
 [Service]
 User=core
-ExecStartPre=/usr/bin/docker pull lukebond/paz-scheduler:latest
+ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-scheduler:latest
 ExecStartPre=-/bin/bash -c "docker inspect paz-scheduler >/dev/null 2>&1 && docker rm -f paz-scheduler || true"
 ExecStart=/bin/bash -c " \
   host_ip=$(fleetctl list-machines --no-legend | head -1 | awk '{ print $2 }'); \
@@ -19,6 +19,6 @@ ExecStart=/bin/bash -c " \
   -e PAZ_SCHEDULER_GEN_KEY=true \
   -e PAZ_SCHEDULER_ETCD_ENDPOINT=$host_ip:4001 \
   --name paz-scheduler \
-  lukebond/paz-scheduler"
+  quay.io/yldio/paz-scheduler"
 ExecStop=/usr/bin/docker rm -f paz-scheduler
 TimeoutStartSec=60m
