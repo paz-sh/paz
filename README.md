@@ -53,6 +53,11 @@ $ export DOCKER_EMAIL="user@example.com"
 
 If you don't have an account on quay.io, create one and get in touch with a maintainer to give you access to the Paz team on quay.io.
 
+You will need to install `fleetctl` and `etcdctl`. On OS/X you can install both with brew:
+```
+$ brew install etcdctl fleetctl
+```
+
 ### Vagrant
 
 Clone this repository and run the following from the root directory of this repository:
