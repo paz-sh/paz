@@ -11,6 +11,8 @@ checkScriptsDirExists
 # import helper scripts
 . ./scripts/helpers.sh
 
+[[ -z ${DOCKER_REGISTRY} || -z ${DOCKER_EMAIL} || -z ${DOCKER_AUTH} ]] && loadEnvVarsFromDockerConfig
+
 checkRequiredEnvVars
 checkDependencies
 

@@ -107,3 +107,14 @@ waitForCoreServicesAnnounce() {
     sleep 1
   done
 }
+
+loadEnvVarsFromDockerConfig() {
+  local DOCKERCFG_PATH=~/.dockercfg
+  echo "Autoloading Docker config from ${DOCKERCFG_PATH}"
+  export DOCKERCFG=$(cat "${DOCKERCFG_PATH}")
+  [[ -z ${DOCKERCFG} ]] || {
+    export DOCKER_REGISTRY='https://quay.io'
+    export DOCKER_EMAIL=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].email || process.exit(1));")
+    export DOCKER_AUTH=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].auth || process.exit(1));")
+  }
+}
