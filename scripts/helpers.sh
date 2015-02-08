@@ -61,7 +61,11 @@ configureSSHAgent() {
 launchAndWaitForUnits() {
   echo
   PAZ_RUNLEVEL=$1
-  ./scripts/start-runlevel.sh $PAZ_RUNLEVEL
+  ./scripts/start-runlevel.sh ${PAZ_RUNLEVEL} || {
+    STATUS=$?;
+    echo "Failed to start at run level ${PAZ_RUNLEVEL}. Exit code ${STATUS}";
+    exit ${STATUS};
+  }
 
   echo Waiting for runlevel $PAZ_RUNLEVEL services to be activated...
   UNIT_COUNT=$2
@@ -102,4 +106,15 @@ waitForCoreServicesAnnounce() {
   until $ETCDCTL_CMD get /paz/services/paz-service-directory >/dev/null 2>&1; do
     sleep 1
   done
+}
+
+loadEnvVarsFromDockerConfig() {
+  local DOCKERCFG_PATH=~/.dockercfg
+  echo "Autoloading Docker config from ${DOCKERCFG_PATH}"
+  export DOCKERCFG=$(cat "${DOCKERCFG_PATH}")
+  [[ -z ${DOCKERCFG} ]] || {
+    export DOCKER_REGISTRY='https://quay.io'
+    export DOCKER_EMAIL=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].email || process.exit(1));")
+    export DOCKER_AUTH=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].auth || process.exit(1));")
+  }
 }
