@@ -45,7 +45,7 @@ Currently cAdvisor is used for monitoring, and there is no centralised logging. 
 
 At present Paz's Docker repositories are privately hosted at Quay.io, so credentials are required.
 
-Paz will attempt to load your credentials for "https://quay.io" from `~/.dockercfg`. They can be overriden with environment variables:
+Paz will attempt to load your credentials for "`https://quay.io`" (or the URL specified in the `DOCKER_REGISTRY` environment variable) from `~/.dockercfg`. This behaviour can be overriden by setting all of these environment variables:
 ```
 $ export DOCKER_REGISTRY="quay.io"
 $ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="

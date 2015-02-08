@@ -110,11 +110,22 @@ waitForCoreServicesAnnounce() {
 
 loadEnvVarsFromDockerConfig() {
   local DOCKERCFG_PATH=~/.dockercfg
-  echo "Autoloading Docker config from ${DOCKERCFG_PATH}"
+  printf "Attempt to autoload Docker config from ${DOCKERCFG_PATH} "
+  if ! which node 2>/dev/null 1>&2; then echo ' aborted - nodejs required'; return 0; fi
+
   export DOCKERCFG=$(cat "${DOCKERCFG_PATH}")
-  [[ -z ${DOCKERCFG} ]] || {
-    export DOCKER_REGISTRY='https://quay.io'
-    export DOCKER_EMAIL=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].email || process.exit(1));")
-    export DOCKER_AUTH=$(node -e "process.stdout.write(JSON.parse(process.env.DOCKERCFG)['${DOCKER_REGISTRY}'].auth || process.exit(1));")
-  }
+  export DOCKER_REGISTRY
+  [[ -z ${DOCKER_REGISTRY} ]] && DOCKER_REGISTRY='https://quay.io'
+  [[ ! -z ${DOCKERCFG} && $(echo ${DOCKERCFG} | grep "${DOCKER_REGISTRY}" -c) -gt 0 ]] && {
+    NODE_FN="(function(key) {
+      var config = JSON.parse(process.env.DOCKERCFG);
+      var dockerRegistry = process.env.DOCKER_REGISTRY;
+      if (config[dockerRegistry] && config[dockerRegistry][key]) {
+        process.stdout.write(config[dockerRegistry][key])
+      }
+    })"
+    export DOCKER_EMAIL=$(node -e "${NODE_FN}('email');")
+    export DOCKER_AUTH=$(node -e "${NODE_FN}('auth');")
+    echo
+  } || echo "FAILED"
 }
