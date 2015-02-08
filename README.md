@@ -43,13 +43,15 @@ Currently cAdvisor is used for monitoring, and there is no centralised logging. 
 
 ## Installation
 
-You need to set up credentials for accessing the Quay.io registry (because at present Paz's Docker repositories are private). Set the following environment variables:
+At present Paz's Docker repositories are privately hosted at Quay.io, so credentials are required.
+
+Paz will attempt to load your credentials for "https://quay.io" from `~/.dockercfg`. They can be overriden with environment variables:
 ```
 $ export DOCKER_REGISTRY="quay.io"
 $ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="
 $ export DOCKER_EMAIL="user@example.com"
 ```
-...replacing the values above with the registry URL and auth and email values that you would normally put in your `~/.dockercfg` file. These variables are used to write a `~/.dockercfg` file on the CoreOS hosts. Use the credentials of any account with read access to pull the images.
+...replacing the values above with the registry URL, auth and email values that you would normally put in your `~/.dockercfg` file. These variables are used to write a `~/.dockercfg` file on the CoreOS hosts. Use the credentials of any account with read access to pull the images.
 
 If you don't have an account on quay.io, create one and get in touch with a maintainer to give you access to the Paz team on quay.io.
 
