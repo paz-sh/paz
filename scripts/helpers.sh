@@ -61,7 +61,11 @@ configureSSHAgent() {
 launchAndWaitForUnits() {
   echo
   PAZ_RUNLEVEL=$1
-  ./scripts/start-runlevel.sh $PAZ_RUNLEVEL
+  ./scripts/start-runlevel.sh ${PAZ_RUNLEVEL} || {
+    STATUS=$?;
+    echo "Failed to start at run level ${PAZ_RUNLEVEL}. Exit code ${STATUS}";
+    exit ${STATUS};
+  }
 
   echo Waiting for runlevel $PAZ_RUNLEVEL services to be activated...
   UNIT_COUNT=$2
