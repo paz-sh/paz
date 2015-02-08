@@ -1,5 +1,11 @@
 #!/bin/bash
 
+checkRequiredEnvVars() {
+  [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
+  [ ! -z "$DOCKER_AUTH" ] || { echo "You must set the \$DOCKER_AUTH environment variable"; exit 1; }
+  [ ! -z "$DOCKER_EMAIL" ] || { echo "You must set the \$DOCKER_EMAIL environment variable"; exit 1; }
+}
+
 # XXX check version of fleetctl and etcdctl- should be recent and should match what will be in vagrant
 checkDependencies() {
   command -v etcdctl >/dev/null 2>&1 || { echo >&2 "Please install etcdctl. Aborting."; exit 1; }

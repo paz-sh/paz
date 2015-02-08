@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 
 echo "Starting Paz integration test script"
 
@@ -17,6 +17,7 @@ copyDependencies() {
 # import helper scripts
 . ../scripts/helpers.sh
 
+checkRequiredEnvVars
 checkCWD
 checkDependencies
 
@@ -25,12 +26,21 @@ checkDependencies
 destroyOldVagrantCluster
 [ $(basename `pwd`) == "test" ] || { cd test; }
 rm -rf scripts unitfiles 2>/dev/null
-createNewVagrantCluster ../vagrant/user-data
+
+set -e
+
+mkdir .install-temp 2>/dev/null
+generateUserDataFile ../vagrant/user-data .install-temp/user-data $DOCKER_REGISTRY $DOCKER_AUTH $DOCKER_EMAIL
+createNewVagrantCluster .install-temp/user-data
+rm -rf .install-temp
+
 copyDependencies
 configureSSHAgent
 
 ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
 export FLEETCTL_TUNNEL=127.0.0.1:2222
+
+set +e
 
 # launch all base paz units except paz-web, and wait until announced
 launchAndWaitForUnits 1 6

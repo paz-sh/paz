@@ -2,12 +2,6 @@
 
 echo "Installing Paz on Vagrant"
 
-checkRequiredEnvVars() {
-  [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
-  [ ! -z "$DOCKER_AUTH" ] || { echo "You must set the \$DOCKER_AUTH environment variable"; exit 1; }
-  [ ! -z "$DOCKER_EMAIL" ] || { echo "You must set the \$DOCKER_EMAIL environment variable"; exit 1; }
-}
-
 checkScriptsDirExists() {
   [ -d "scripts" ] || { echo "You must run this script from the root directory of the repository"; exit 1; }
 }

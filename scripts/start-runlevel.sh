@@ -1,4 +1,4 @@
-#!/bin/bash -ex
+#!/bin/bash -e
 [[ $1 ]] || { echo "Missing numeric runlevel argument (ie. 1 or 2)"; exit 1; }
 [[ $ETCD_ENDPOINT ]] || ETCD_ENDPOINT=172.17.8.101:4001
 
