@@ -49,7 +49,7 @@ $ export DOCKER_REGISTRY="quay.io"
 $ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="
 $ export DOCKER_EMAIL="user@example.com"
 ```
-...replacing the values above with the registry URL and auth and email values that you would normally put in your `~.dockercfg` file. These variables are used to write a `~/.dockercfg` file on the CoreOS hosts. Use the credentials of any account with read access to pull the images.
+...replacing the values above with the registry URL and auth and email values that you would normally put in your `~/.dockercfg` file. These variables are used to write a `~/.dockercfg` file on the CoreOS hosts. Use the credentials of any account with read access to pull the images.
 
 If you don't have an account on quay.io, create one and get in touch with a maintainer to give you access to the Paz team on quay.io.
 
