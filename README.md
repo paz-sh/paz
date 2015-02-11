@@ -43,7 +43,7 @@ Currently cAdvisor is used for monitoring, and there is no centralised logging. 
 
 ## Installation
 
-At present Paz's Docker repositories are privately hosted at Quay.io, so credentials are required.
+At present Paz's Docker repositories are privately hosted at Quay.io, so credentials are required. If you haven't got a quay.io account then create one. You will also need to be a member of the "pazteam" team within the "yldio" organisation in quay.io. Email a maintainer or raise an issue (specifying your quay.io username) to be given access.
 
 Paz will attempt to load your credentials for "`https://quay.io`" (or the URL specified in the `DOCKER_REGISTRY` environment variable) from `~/.dockercfg`. This behaviour can be overriden by setting all of these environment variables:
 ```
@@ -52,8 +52,6 @@ $ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="
 $ export DOCKER_EMAIL="user@example.com"
 ```
 ...replacing the values above with the registry URL, auth and email values that you would normally put in your `~/.dockercfg` file. These variables are used to write a `~/.dockercfg` file on the CoreOS hosts. Use the credentials of any account with read access to pull the images.
-
-If you don't have an account on quay.io, create one and get in touch with a maintainer to give you access to the Paz team on quay.io.
 
 You will need to install `fleetctl` and `etcdctl`. On OS/X you can install both with brew:
 ```
