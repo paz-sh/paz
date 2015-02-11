@@ -45,7 +45,9 @@ Currently cAdvisor is used for monitoring, and there is no centralised logging. 
 
 At present Paz's Docker repositories are privately hosted at Quay.io, so credentials are required. If you haven't got a quay.io account then create one. You will also need to be a member of the "pazteam" team within the "yldio" organisation in quay.io. Email a maintainer or raise an issue (specifying your quay.io username) to be given access.
 
-Paz will attempt to load your credentials for "`https://quay.io`" (or the URL specified in the `DOCKER_REGISTRY` environment variable) from `~/.dockercfg`. This behaviour can be overriden by setting all of these environment variables:
+Paz will attempt to open `~/.dockercfg` and load your credentials for "`quay.io`", or the URL specified in the `DOCKER_REGISTRY` environment variable. If the key is not found, it will also check for "`https://`" and "`http://`" prefixes. It should be noted that `http://quay.io` redirects to `https://quay.io`, and plain HTTP registries should not be used in case of MITM attacks.
+
+This behaviour can be overriden by setting all of these environment variables:
 ```
 $ export DOCKER_REGISTRY="quay.io"
 $ export DOCKER_AUTH="dXNlcm5hZTpwYXNzd29yZAo="

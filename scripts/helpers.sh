@@ -115,14 +115,17 @@ loadEnvVarsFromDockerConfig() {
 
   export DOCKERCFG=$(cat "${DOCKERCFG_PATH}")
   export DOCKER_REGISTRY
-  [[ -z ${DOCKER_REGISTRY} ]] && DOCKER_REGISTRY='https://quay.io'
+  [[ -z ${DOCKER_REGISTRY} ]] && DOCKER_REGISTRY='quay.io'
   [[ ! -z ${DOCKERCFG} && $(echo ${DOCKERCFG} | grep "${DOCKER_REGISTRY}" -c) -gt 0 ]] && {
     NODE_FN="(function(key) {
       var config = JSON.parse(process.env.DOCKERCFG);
-      var dockerRegistry = process.env.DOCKER_REGISTRY;
-      if (config[dockerRegistry] && config[dockerRegistry][key]) {
-        process.stdout.write(config[dockerRegistry][key])
-      }
+      ['', 'https://', 'http://'].forEach(function(prefix) {
+        var prefixedDockerRegistry = prefix + process.env.DOCKER_REGISTRY;
+        if (config[prefixedDockerRegistry] && config[prefixedDockerRegistry][key]) {
+          process.stdout.write(config[prefixedDockerRegistry][key]);
+          process.exit(0);
+        }
+      });
     })"
     export DOCKER_EMAIL=$(node -e "${NODE_FN}('email');")
     export DOCKER_AUTH=$(node -e "${NODE_FN}('auth');")
