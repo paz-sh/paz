@@ -2,3 +2,4 @@ unitfiles
 scripts
 coreos-vagrant
 config.rb
+.install-temp
