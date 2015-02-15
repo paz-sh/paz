@@ -31,7 +31,7 @@ rm -rf scripts unitfiles 2>/dev/null
 
 set -e
 
-mkdir .install-temp 2>/dev/null
+mkdir -p .install-temp 2>/dev/null
 generateUserDataFile ../vagrant/user-data .install-temp/user-data $DOCKER_REGISTRY $DOCKER_AUTH $DOCKER_EMAIL
 createNewVagrantCluster .install-temp/user-data
 rm -rf .install-temp
