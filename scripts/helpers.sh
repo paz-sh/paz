@@ -18,6 +18,10 @@ checkDependencies() {
   command -v fleetctl >/dev/null 2>&1 || { echo >&2 "Please install fleetctl. Aborting."; exit 1; }
 }
 
+checkForVagrantCluster() {
+  [ -d "coreos-vagrant" ] || { echo >&2 "No extant Vagrant cluster"; exit 1; }
+}
+
 destroyOldVagrantCluster() {
   echo
   echo "Checking for existing Vagrant cluster"
@@ -28,6 +32,16 @@ destroyOldVagrantCluster() {
     cd ..
   fi
   rm -rf coreos-vagrant 2>/dev/null
+}
+
+destroyExistingUnits() {
+  echo
+  echo "Destroying existing units"
+  fleetctl -strict-host-key-checking=false destroy \
+    paz-orchestrator paz-orchestrator-announce \
+    paz-service-directory paz-service-directory-announce \
+    paz-scheduler paz-scheduler-announce \
+    paz-web paz-web-announce 2>/dev/null
 }
 
 generateUserDataFile() {
