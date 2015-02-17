@@ -2,13 +2,10 @@
 Description=Web front-end for the paz platform.
 After=docker.service
 Requires=docker.service
-After=etcd.service
-Requires=etcd.service
-After=fleet.service
-Requires=fleet.service
 
 [Service]
 User=core
+Restart=always
 ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-web:latest
 ExecStartPre=-/bin/sh -c "docker inspect paz-web >/dev/null 2>&1 && docker rm -f paz-web || true"
 ExecStart=/bin/bash -c " \

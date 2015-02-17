@@ -4,14 +4,11 @@ BindsTo=paz-web.service
 After=docker.service
 Requires=docker.service
 After=etcd.service
-Requires=etcd.service
-After=fleet.service
-Requires=fleet.service
 
 [Service]
-Restart=always
 User=core
 EnvironmentFile=/etc/environment
+Restart=always
 ExecStartPre=/bin/sh -c " \
   until docker inspect \
     -f '{{range $i, $e := .NetworkSettings.Ports }}{{$p := index $e 0}}{{$p.HostPort}}{{end}}' paz-web >/dev/null 2>&1; \

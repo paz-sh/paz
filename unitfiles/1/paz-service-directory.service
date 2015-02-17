@@ -3,12 +3,10 @@ Description=A catalog of services with versioned config for running as Docker co
 After=docker.service
 Requires=docker.service
 After=etcd.service
-Requires=etcd.service
-After=fleet.service
-Requires=fleet.service
 
 [Service]
 User=core
+Restart=always
 ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-service-directory:latest
 ExecStartPre=-/bin/sh -c "docker inspect paz-service-directory >/dev/null 2>&1 && docker rm -f paz-service-directory || true"
 ExecStart=/usr/bin/docker run -P --name paz-service-directory quay.io/yldio/paz-service-directory

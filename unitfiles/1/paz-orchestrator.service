@@ -4,12 +4,11 @@ After=docker.service
 Requires=docker.service
 After=etcd.service
 Requires=etcd.service
-After=fleet.service
-Requires=fleet.service
 
 [Service]
 User=core
 EnvironmentFile=/etc/paz-environment
+Restart=Always
 ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-orchestrator:latest
 ExecStartPre=/bin/bash -c "etcdctl mkdir /paz/config >/dev/null 2>&1; etcdctl set /paz/config/domain $PAZ_DOMAIN"
 ExecStartPre=-/bin/bash -c " \

@@ -5,13 +5,11 @@ After=docker.service
 Requires=docker.service
 After=etcd.service
 Requires=etcd.service
-After=fleet.service
-Requires=fleet.service
 
 [Service]
-Restart=always
 User=core
 EnvironmentFile=/etc/environment
+Restart=always
 ExecStartPre=/bin/sh -c " \
   until \
     docker inspect \

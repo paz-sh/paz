@@ -2,13 +2,11 @@
 Description=paz-scheduler: Takes apps from your paz service directory and runs them on a CoreOS cluster using fleet
 After=docker.service
 Requires=docker.service
-After=etcd.service
-Requires=etcd.service
 After=fleet.service
-Requires=fleet.service
 
 [Service]
 User=core
+Restart=always
 ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-scheduler:latest
 ExecStartPre=-/bin/bash -c "docker inspect paz-scheduler >/dev/null 2>&1 && docker rm -f paz-scheduler || true"
 ExecStart=/bin/bash -c " \
