@@ -30,6 +30,8 @@ configureSSHAgent
 
 ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
 export FLEETCTL_ENDPOINT=http://172.17.8.101:4001
+printDebug ETCDCTL_CMD=${ETCDCTL_CMD}
+printDebug FLEETCTL_ENDPOINT=${FLEETCTL_ENDPOINT}
 
 # launch all base paz units except paz-web, and wait until announced
 launchAndWaitForUnits 1 6

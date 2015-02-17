@@ -70,6 +70,8 @@ $ ./scripts/install-vagrant.sh
 
 This will bring up a three-node CoreOS Vagrant cluster and install Paz on it. Note that it may take 10 minutes or more to complete.
 
+For extra debug output, run with `DEBUG=1` environment variable set.
+
 ### DigitalOcean
 
 Paz has been tested on Digital Ocean but there isn't currently an install script for it. It shouldn't take much, just be sure to edit the PAZ_DNSIMPLE_* values in `digitalocean/user-data`. Stay tuned...

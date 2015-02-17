@@ -1,9 +1,15 @@
 #!/bin/bash
 
+printDebug() {
+  if [ -n "$DEBUG" ]; then echo DEBUG: $*; fi
+}
+
 checkRequiredEnvVars() {
   [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
   [ ! -z "$DOCKER_AUTH" ] || { echo "You must set the \$DOCKER_AUTH environment variable"; exit 1; }
   [ ! -z "$DOCKER_EMAIL" ] || { echo "You must set the \$DOCKER_EMAIL environment variable"; exit 1; }
+  printDebug DOCKER_REGISTRY=${DOCKER_REGISTRY}
+  printDebug DOCKER_EMAIL=${DOCKER_EMAIL}
 }
 
 # XXX check version of fleetctl and etcdctl- should be recent and should match what will be in vagrant
@@ -40,6 +46,7 @@ createNewVagrantCluster() {
   cp $1 coreos-vagrant
   cd coreos-vagrant
   DISCOVERY_TOKEN=`curl -s https://discovery.etcd.io/new` && perl -i -p -e "s@discovery: https://discovery.etcd.io/\w+@discovery: $DISCOVERY_TOKEN@g" user-data
+  printDebug Using discovery token ${DISCOVERY_TOKEN}
   perl -p -e 's/\#\$num_instances=1$/\$num_instances=3/g' config.rb.sample > config.rb
   vagrant box update
   vagrant up
@@ -88,6 +95,7 @@ launchAndWaitForUnits() {
       echo Failed unit detected
       exit 1
     fi
+    sleep 0.5
   done
   echo
   echo All runlevel $PAZ_RUNLEVEL units successfully activated!
@@ -131,4 +139,5 @@ loadEnvVarsFromDockerConfig() {
     export DOCKER_AUTH=$(node -e "${NODE_FN}('auth');")
     echo
   } || echo "FAILED"
+  printDebug DOCKERCFG=${DOCKERCFG}
 }
