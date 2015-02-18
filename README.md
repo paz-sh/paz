@@ -78,6 +78,21 @@ If you already have a Vagrant cluster running and want to reinstall the units, u
 $./script/reinstall-units-vagrant.sh
 ```
 
+To interact with the units in the cluster via Fleet, just specify the URL to Etcd on one of your hosts as a parameter to Fleet. e.g.:
+
+```
+$ fleetctl -strict-host-key-checking=false -endpoint=http://172.17.8.101:4001 list-units
+```
+
+You can also SSH into one of the VMs and run `fleetctl` from there:
+
+```
+$ cd coreos-vagrant
+$ vagrant ssh core-01
+```
+
+...however bear in mind that Fleet needs to SSH into the other VMs in order to perform operations that involve calling down to systemd (e.g. `journal`), and for this you need to have SSHd into the VM running the unit in question. For this reason you may find it simpler (albeit more verbose) to run `fleetctl` from outside the CoreOS VMs.
+
 ### DigitalOcean
 
 Paz has been tested on Digital Ocean but there isn't currently an install script for it. It shouldn't take much, just be sure to edit the PAZ_DNSIMPLE_* values in `digitalocean/user-data`. Stay tuned...
