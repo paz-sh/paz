@@ -72,6 +72,12 @@ This will bring up a three-node CoreOS Vagrant cluster and install Paz on it. No
 
 For extra debug output, run with `DEBUG=1` environment variable set.
 
+If you already have a Vagrant cluster running and want to reinstall the units, use:
+
+```
+$./script/reinstall-units-vagrant.sh
+```
+
 ### DigitalOcean
 
 Paz has been tested on Digital Ocean but there isn't currently an install script for it. It shouldn't take much, just be sure to edit the PAZ_DNSIMPLE_* values in `digitalocean/user-data`. Stay tuned...
