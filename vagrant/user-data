@@ -61,7 +61,7 @@ coreos:
         [Service]
         Restart=always
         ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --name=cadvisor google/cadvisor:latest
-        ExecStop=/usr/bin/docker stop -t 2 google/cadvisor
+        ExecStop=/usr/bin/docker stop -t 2 cadvisor
     - name: paz-dnsmasq.service
       runtime: true
       command: start
