@@ -107,3 +107,12 @@ $ ./integration.sh
 ```
 
 Each paz repository (service directory, orchestrator, scheduler) has tests that run on paz-ci.yld.io (in StriderCD), triggered by a Github webhook.
+
+## Paz Repositories
+
+The various components of Paz are spread across several repositories:
+* [Orchestrator](https://github.com/yldio/paz-orchestrator)
+* [Service Directory](https://github.com/yldio/paz-service-directory)
+* [Scheduler](https://github.com/yldio/paz-scheduler)
+* [Web](https://github.com/yldio/paz-web)
+* [HAProxy](https://github.com/yldio/paz-haproxy)
