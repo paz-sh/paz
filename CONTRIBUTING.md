@@ -1,8 +1,6 @@
 # Contributing
 
-Paz is on a roadmap to being open-sourced, but is not currently an open-source project. Paz is a YLD project and the copyright (except where documented) is held by YLD.
-
-YLD developers (i.e. anyone associated with YLD who has access to view this repository) may make pull requests to contribute to Paz. Others outside YLD may be given acess to the repository and be asked to sign a CLA.
+Paz is a YLD project and the copyright (except where documented) is held by YLD.
 
 ## Submitting a Pull Request
 
