@@ -2,10 +2,8 @@
 
 echo "Starting Paz integration test script"
 
-checkCWD() {
-  DIR=$(basename `pwd`)
-  [ "$DIR" == "test" ] || { "You must run this script from the test directory"; exit 1; }
-}
+declare -r DIR=$(cd "$(dirname "$0")" && pwd)
+cd "${DIR}"
 
 copyDependencies() {
   mkdir unitfiles
@@ -20,7 +18,6 @@ copyDependencies() {
 [[ -z ${DOCKER_REGISTRY} || -z ${DOCKER_EMAIL} || -z ${DOCKER_AUTH} ]] && loadEnvVarsFromDockerConfig
 
 checkRequiredEnvVars
-checkCWD
 checkDependencies
 
 # XXX check if Vagrant is installed
