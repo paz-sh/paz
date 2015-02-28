@@ -1,7 +1,5 @@
 # Contributing
 
-Paz is a YLD project and the copyright (except where documented) is held by YLD.
-
 ## Submitting a Pull Request
 
 Please ensure that your pull request meets the following criteria:
