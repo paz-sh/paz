@@ -2,14 +2,31 @@ Paz
 ===
 _Continuous deployment production environments, built on Docker, CoreOS, etcd and fleet._
 
-Paz is a pluggable in-house service platform with a PaaS-like workflow.
+Paz is an in-house service platform with a PaaS-like workflow.
 
 ![Screenshot](https://raw.githubusercontent.com/yldio/paz/206283f9f2b0c21bc4abf3a1f3926bd5e0f0a962/docs/images/Screen%20Shot%202014-11-22%20at%2016.39.07.png)
+
+## What is Paz?
+
+Paz is...
+* Like your own private PaaS that you can host anywhere
+* Free
+* Open-source
+* Simple
+* A web front-end to CoreOS' Fleet with a PaaS-like workflow
+* Like a clustered/multi-host Dokku
+* Alpha software
+* Written in Node.js
+
+Paz is not...
+* A hosted service
+* A complete, enterprise-ready orchestration solution
 
 ## Features
 * Beautiful web UI
 * Run anywhere (Vagrant, public cloud or bare metal)
 * No special code required in your services
+  - i.e. it will run any containerised application unmodified
 * Built for Continuous Deployment
 * Zero-downtime deployments
 * Service discovery
@@ -25,21 +42,28 @@ Paz is a pluggable in-house service platform with a PaaS-like workflow.
 
 ### Service Directory
 This is a database of all your services and their configuration (e.g. environment variables, data volumes, port mappings and the number of instances to launch). Ultimately this information will be reduced to a set of systemd unit files (by the scheduler) to be submitted to Fleet for running on the cluster.
-This service has a REST API and is backed by a database (LevelDB).
+The service directory is a Node.js API backed by a LevelDB database.
 
 ### Scheduler
 This service receives HTTP POST commands to deploy services that are defined in the service directory. Using the service data from the directory it will render unit files and run them on the CoreOS cluster using Fleet. A history of deployments and associated config is also available from the scheduler.
 
 For each service the scheduler will deploy a container for the service and an announce sidekick container.
 
+The scheduler is a Node.js API backed by a LevelDB database and uses Fleet to launch services.
+
 ### Orchestrator
 This is a service that ties all of the other services together, providing a single access-point for the front-end to interface with. Also offers a web socket endpoint for realtime updates to the web front-end.
 
+The orchestrator is a Node.js API server that communicates with Etcd, Fleet, the scheduler and service directory.
+
 ### Web Front-End
-A beautiful and easy-to-use web UI for managing your services and observing the health of your cluster. Built in Ember.
+A beautiful and easy-to-use web UI for managing your services and observing the health of your cluster. Built in Ember.js.
+
+### HAProxy
+Paz uses Confd to dynamically configure HAProxy based on service availability information declared in Etcd. HAProxy is configured to route external external and internal requests to the correct host for the desired service.
 
 ### Monitoring and Logging
-Currently cAdvisor is used for monitoring, and there is no centralised logging. WIP.
+Currently cAdvisor is used for monitoring, and there is not yet any centralised logging. Monitoring and logging are high-priority features on the roadmap.
 
 ## Installation
 
