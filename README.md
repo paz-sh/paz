@@ -60,7 +60,7 @@ The orchestrator is a Node.js API server that communicates with Etcd, Fleet, the
 A beautiful and easy-to-use web UI for managing your services and observing the health of your cluster. Built in Ember.js.
 
 ### HAProxy
-Paz uses Confd to dynamically configure HAProxy based on service availability information declared in Etcd. HAProxy is configured to route external external and internal requests to the correct host for the desired service.
+Paz uses Confd to dynamically configure HAProxy based on service availability information declared in Etcd. HAProxy is configured to route external and internal requests to the correct host for the desired service.
 
 ### Monitoring and Logging
 Currently cAdvisor is used for monitoring, and there is not yet any centralised logging. Monitoring and logging are high-priority features on the roadmap.
