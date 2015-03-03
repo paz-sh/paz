@@ -6,8 +6,6 @@ printDebug() {
 
 checkRequiredEnvVars() {
   [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
-  [ ! -z "$DOCKER_AUTH" ] || { echo "You must set the \$DOCKER_AUTH environment variable"; exit 1; }
-  [ ! -z "$DOCKER_EMAIL" ] || { echo "You must set the \$DOCKER_EMAIL environment variable"; exit 1; }
   printDebug DOCKER_REGISTRY=${DOCKER_REGISTRY}
   printDebug DOCKER_EMAIL=${DOCKER_EMAIL}
 }
@@ -152,6 +150,6 @@ loadEnvVarsFromDockerConfig() {
     export DOCKER_EMAIL=$(node -e "${NODE_FN}('email');")
     export DOCKER_AUTH=$(node -e "${NODE_FN}('auth');")
     echo
-  } || echo "FAILED"
+  } || printf "FAILED\nConnecting to the registry as a guest."
   printDebug DOCKERCFG=${DOCKERCFG}
 }
