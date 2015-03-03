@@ -60,8 +60,12 @@ coreos:
 
         [Service]
         Restart=always
+        ExecStartPre=-/bin/bash -c " \
+          docker inspect cadvisor >/dev/null 2>&1 \
+          && docker rm -f cadvisor || true"
         ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --name=cadvisor google/cadvisor:latest
         ExecStop=/usr/bin/docker stop -t 2 cadvisor
+        ExecStop=/usr/bin/docker rm -f cadvisor
     - name: paz-dnsmasq.service
       runtime: true
       command: start
@@ -79,8 +83,12 @@ coreos:
 
         [Service]
         Restart=always
+        ExecStartPre=-/bin/bash -c " \
+          docker inspect paz-dnsmasq >/dev/null 2>&1 \
+          && docker rm -f paz-dnsmasq || true"
         ExecStart=/usr/bin/docker run -p $private_ipv4:53:53/udp --privileged --name=paz-dnsmasq tomgco/dnsmasq-catch paz $private_ipv4
-        ExecStop=/usr/bin/docker stop -t 2 tomgco/dnsmasq-catch
+        ExecStop=/usr/bin/docker stop -t 2 paz-dnsmasq
+        ExecStop=/usr/bin/docker rm -f paz-dnsmasq
     - name: paz-haproxy.service
       runtime: true
       command: start
