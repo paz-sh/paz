@@ -1,3 +1,5 @@
+[![Gitter chat](https://badges.gitter.im/yldio/paz.png)](https://gitter.im/yldio/paz)
+
 Paz
 ===
 _Continuous deployment production environments, built on Docker, CoreOS, etcd and fleet._
