@@ -111,7 +111,26 @@ $ vagrant ssh core-01
 
 ### DigitalOcean
 
-Paz has been tested on Digital Ocean but there isn't currently an install script for it. It shouldn't take much, just be sure to edit the PAZ_DNSIMPLE_* values in `digitalocean/user-data`. Stay tuned...
+Paz has been tested on Digital Ocean but there isn't currently an install script for it.
+
+In short, you need to create your own cluster and then install the Paz units on there.
+
+The first step is to spin up a CoreOS cluster on DigitalOcean with Paz's cloud-config userdata, and then we'll install Paz on it.
+
+1. Click the "Create Droplet" button in the DigitalOcean console.
+2. Give your droplet a name and choose your droplet size and region.
+3. Tick "Private Networking" and "Enable User Data"
+4. Paste the contents of the `digitalocean/userdata` file in the `yldio/paz` repository into the userdata text area.
+5. Go to `http://discovery.etcd.io/new` and copy the URL that it prints in the browser, pasting it into the userdata text area instead of the one that is already there.
+6. In the `write_files` section, in the section for writing the `/etc/environment` file, edit `PAZ_DOMAIN`, `PAZ_DNSIMPLE_APIKEY` and `PAZ_DNSIMPLE_EMAIL` fields, putting in your dnsimple-managed domain name, dnsimple API key and dnsimple account's email address, respectively.
+   - e.g. "lukeb0nd.com", "ABcdE1fGHi2jk3LmnOP" and "me@blah.com"
+7. Before submitting, copy this userdata to a text file or editor because we'll need to use it again unchanged
+8. Select the CoreOS version you want to install (e.g. latest stable or beta should be fine).
+9. Add the SSH keys that will be added to the box (under `core` user).
+10. Click "Create Droplet".
+11. Repeat for the number of nodes you want in the cluster (e.g. 3), using the exact same userdata file (i.e. don't generate a new discovery token etc.).
+12. Once all droplets have booted (test by trying to SSH into each one, run `docker ps` and observe that `paz-dnsmasq`, `cadvisor` and `paz-haproxy` are all running on each box), you may proceed.
+13. Install Paz
 
 ## Tests
 
