@@ -5,7 +5,7 @@ coreos:
     reboot-strategy: off
   etcd:
     #generate a new token for each unique cluster from https://discovery.etcd.io/new
-    discovery: https://discovery.etcd.io/533324ba0cabbfe6a7c01a98bb1db84d
+    discovery: https://discovery.etcd.io/57e78ed9f768da2374758752eb308f4c
     addr: $public_ipv4:4001
     peer-addr: $public_ipv4:7001
   fleet:
@@ -17,10 +17,10 @@ coreos:
       command: start
     - name: docker.service
       drop-ins:
-        - path: /etc/systemd/system/docker.service.d/50-docker-dns.conf
+        - name: 50-docker-dns.conf
           content: |
               [Service]
-              Environment='DOCKER_OPTS=-r=false -s=overlay -D --dns=$private_ipv4 --dns=8.8.8.8'
+              Environment='DOCKER_OPTS=--restart=false -s=overlay -D --dns=$private_ipv4 --dns=8.8.8.8'
     - name: create-swap.service
       command: start
       runtime: true
