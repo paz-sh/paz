@@ -130,7 +130,20 @@ The first step is to spin up a CoreOS cluster on DigitalOcean with Paz's cloud-c
 10. Click "Create Droplet".
 11. Repeat for the number of nodes you want in the cluster (e.g. 3), using the exact same userdata file (i.e. don't generate a new discovery token etc.).
 12. Once all droplets have booted (test by trying to SSH into each one, run `docker ps` and observe that `paz-dnsmasq`, `cadvisor` and `paz-haproxy` are all running on each box), you may proceed.
-13. Install Paz
+13. Install Paz:
+```
+$ ssh-add ~/.ssh/id_rsa
+$ FLEETCTL_TUNNEL=<MACHINE_IP> fleetctl -strict-host-key-checking=false start unitfiles/1/*
+```
+...where `<MACHINE_IP>` is an IP address of any node in your cluster.
+You can wait for all units to be active/running like so:
+```
+$ FLEETCTL_TUNNEL=<MACHINE_IP> watch -n 5 fleetctl -strict-host-key-checking=false list-units
+```
+Once they're up you can install the final services:
+```
+$ FLEETCTL_TUNNEL=<MACHINE_IP> fleetctl -strict-host-key-checking=false start unitfiles/2/*
+```
 
 ## Tests
 
