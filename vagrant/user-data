@@ -5,7 +5,7 @@ coreos:
     reboot-strategy: off
   etcd:
     #generate a new token for each unique cluster from https://discovery.etcd.io/new
-    discovery: https://discovery.etcd.io/533324ba0cabbfe6a7c01a98bb1db84d
+    discovery: https://discovery.etcd.io/0fb290c2f54d9338f0abefe73745f8cd
     addr: $public_ipv4:4001
     peer-addr: $public_ipv4:7001
   fleet:
@@ -17,10 +17,10 @@ coreos:
       command: start
     - name: docker.service
       drop-ins:
-        - path: /etc/systemd/system/docker.service.d/50-docker-dns.conf
+        - name: 50-docker-dns.conf
           content: |
               [Service]
-              Environment='DOCKER_OPTS=-r=false -s=overlay -D --dns=$private_ipv4 --dns=8.8.8.8'
+              Environment='DOCKER_OPTS=--restart=false -D --dns=$private_ipv4 --dns=8.8.8.8'
     - name: cadvisor.service
       runtime: true
       command: start
@@ -37,7 +37,6 @@ coreos:
           docker inspect cadvisor >/dev/null 2>&1 \
           && docker rm -f cadvisor || true"
         ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --name=cadvisor google/cadvisor:latest
-        ExecStop=/usr/bin/docker stop -t 2 cadvisor
         ExecStop=/usr/bin/docker rm -f cadvisor
     - name: paz-dnsmasq.service
       runtime: true
@@ -60,7 +59,6 @@ coreos:
           docker inspect paz-dnsmasq >/dev/null 2>&1 \
           && docker rm -f paz-dnsmasq || true"
         ExecStart=/usr/bin/docker run -p $private_ipv4:53:53/udp --privileged --name=paz-dnsmasq tomgco/dnsmasq-catch paz $private_ipv4
-        ExecStop=/usr/bin/docker stop -t 2 paz-dnsmasq
         ExecStop=/usr/bin/docker rm -f paz-dnsmasq
     - name: paz-haproxy.service
       runtime: true
@@ -85,7 +83,6 @@ coreos:
           docker inspect paz-haproxy >/dev/null 2>&1 \
           && docker rm -f paz-haproxy || true"
         ExecStart=/usr/bin/docker run -p 80:80 -p 1936:1936 -e ETCD=$private_ipv4:4001 --name paz-haproxy quay.io/yldio/paz-haproxy
-        ExecStop=/usr/bin/docker stop -t 2 paz-haproxy
         ExecStop=/usr/bin/docker rm -f paz-haproxy
         TimeoutStartSec=20m
     - name: paz-pubkey-watcher.service
