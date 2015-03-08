@@ -11,9 +11,6 @@ checkScriptsDirExists
 # import helper scripts
 . ./scripts/helpers.sh
 
-[[ -z ${DOCKER_REGISTRY} || -z ${DOCKER_EMAIL} || -z ${DOCKER_AUTH} ]] && loadEnvVarsFromDockerConfig
-
-checkRequiredEnvVars
 checkDependencies
 
 checkForVagrantCluster
@@ -24,7 +21,6 @@ ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
 export FLEETCTL_ENDPOINT=http://172.17.8.101:4001
 printDebug ETCDCTL_CMD=${ETCDCTL_CMD}
 printDebug FLEETCTL_ENDPOINT=${FLEETCTL_ENDPOINT}
-
 
 # destroy all paz units, then re-launch all except paz-web & wait
 destroyExistingUnits

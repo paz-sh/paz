@@ -15,8 +15,6 @@ copyDependencies() {
 # import helper scripts
 . ../scripts/helpers.sh
 
-[[ -z ${DOCKER_REGISTRY} || -z ${DOCKER_EMAIL} || -z ${DOCKER_AUTH} ]] && loadEnvVarsFromDockerConfig
-
 checkRequiredEnvVars
 checkDependencies
 
@@ -28,10 +26,7 @@ rm -rf scripts unitfiles 2>/dev/null
 
 set -e
 
-mkdir -p .install-temp 2>/dev/null
-generateUserDataFile ../vagrant/user-data .install-temp/user-data $DOCKER_REGISTRY $DOCKER_AUTH $DOCKER_EMAIL
-createNewVagrantCluster .install-temp/user-data
-rm -rf .install-temp
+createNewVagrantCluster ../vagrant/user-data
 
 copyDependencies
 configureSSHAgent

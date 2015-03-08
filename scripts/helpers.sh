@@ -4,12 +4,6 @@ printDebug() {
   if [ -n "$DEBUG" ]; then echo DEBUG: $*; fi
 }
 
-checkRequiredEnvVars() {
-  [ ! -z "$DOCKER_REGISTRY" ] || { echo "Using the default/official Docker registry as \$DOCKER_REGISTRY environment variable not set"; DOCKER_REGISTRY="https://index.docker.io/v1/"; }
-  printDebug DOCKER_REGISTRY=${DOCKER_REGISTRY}
-  printDebug DOCKER_EMAIL=${DOCKER_EMAIL}
-}
-
 # XXX check version of fleetctl and etcdctl- should be recent and should match what will be in vagrant
 checkDependencies() {
   command -v etcdctl >/dev/null 2>&1 || { echo >&2 "Please install etcdctl. Aborting."; exit 1; }
@@ -42,15 +36,6 @@ destroyExistingUnits() {
     paz-web paz-web-announce 2>/dev/null
 }
 
-generateUserDataFile() {
-  echo
-  echo "Generating user-data file from $1 -> $2"
-  cp $1 $2
-  perl -i -p -e "s@__DOCKER_REGISTRY__@$3@" $2
-  perl -i -p -e "s/__DOCKER_AUTH__/$4/" $2
-  perl -i -p -e "s/__DOCKER_EMAIL__/$5/" $2
-}
-
 createNewVagrantCluster() {
   echo
   echo "Creating a new Vagrant cluster"
@@ -60,6 +45,8 @@ createNewVagrantCluster() {
   DISCOVERY_TOKEN=`curl -s https://discovery.etcd.io/new` && perl -i -p -e "s@discovery: https://discovery.etcd.io/\w+@discovery: $DISCOVERY_TOKEN@g" user-data
   printDebug Using discovery token ${DISCOVERY_TOKEN}
   perl -p -e 's/\#\$num_instances=1$/\$num_instances=3/g' config.rb.sample > config.rb
+  perl -pi -e 's/alpha/beta/g' config.rb
+  perl -pi -e 's/\#\$update_channel=/\$update_channel=/g' config.rb
   vagrant box update
   vagrant up
   echo Waiting for Vagrant cluster to be ready...
@@ -126,30 +113,4 @@ waitForCoreServicesAnnounce() {
   until $ETCDCTL_CMD get /paz/services/paz-service-directory >/dev/null 2>&1; do
     sleep 1
   done
-}
-
-loadEnvVarsFromDockerConfig() {
-  local DOCKERCFG_PATH=~/.dockercfg
-  printf "Attempt to autoload Docker config from ${DOCKERCFG_PATH} "
-  if ! which node 2>/dev/null 1>&2; then echo ' aborted - nodejs required'; return 0; fi
-
-  export DOCKERCFG=$(cat "${DOCKERCFG_PATH}")
-  export DOCKER_REGISTRY
-  [[ -z ${DOCKER_REGISTRY} ]] && DOCKER_REGISTRY='quay.io'
-  [[ ! -z ${DOCKERCFG} && $(echo ${DOCKERCFG} | grep "${DOCKER_REGISTRY}" -c) -gt 0 ]] && {
-    NODE_FN="(function(key) {
-      var config = JSON.parse(process.env.DOCKERCFG);
-      ['', 'https://', 'http://'].forEach(function(prefix) {
-        var prefixedDockerRegistry = prefix + process.env.DOCKER_REGISTRY;
-        if (config[prefixedDockerRegistry] && config[prefixedDockerRegistry][key]) {
-          process.stdout.write(config[prefixedDockerRegistry][key]);
-          process.exit(0);
-        }
-      });
-    })"
-    export DOCKER_EMAIL=$(node -e "${NODE_FN}('email');")
-    export DOCKER_AUTH=$(node -e "${NODE_FN}('auth');")
-    echo
-  } || printf "FAILED\nConnecting to the registry as a guest."
-  printDebug DOCKERCFG=${DOCKERCFG}
 }
