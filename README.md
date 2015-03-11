@@ -1,4 +1,4 @@
-[![Gitter chat](https://badges.gitter.im/yldio/paz.png)](https://gitter.im/yldio/paz)
+[![Gitter chat](https://badges.gitter.im/paz-sh/paz.png)](https://gitter.im/paz-sh/paz)
 
 Paz
 ===
