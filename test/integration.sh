@@ -15,10 +15,8 @@ copyDependencies() {
 # import helper scripts
 . ../scripts/helpers.sh
 
-checkRequiredEnvVars
 checkDependencies
 
-# XXX check if Vagrant is installed
 # XXX check version of CoreOS in local Vagrant
 destroyOldVagrantCluster
 [ $(basename `pwd`) == "test" ] || { cd test; }

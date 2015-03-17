@@ -6,6 +6,7 @@ printDebug() {
 
 # XXX check version of fleetctl and etcdctl- should be recent and should match what will be in vagrant
 checkDependencies() {
+  command -v vagrant >/dev/null 2>&1 || { echo >&2 "Please install vagrant. Aborting"; exit 1; }
   command -v etcdctl >/dev/null 2>&1 || { echo >&2 "Please install etcdctl. Aborting."; exit 1; }
   command -v fleetctl >/dev/null 2>&1 || { echo >&2 "Please install fleetctl. Aborting."; exit 1; }
 }
