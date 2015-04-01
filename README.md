@@ -76,6 +76,8 @@ You will need to install `fleetctl` and `etcdctl`. On OS/X you can install both 
 $ brew install etcdctl fleetctl
 ```
 
+You'll also need to [install vagrant](https://www.vagrantup.com/downloads.html) on your machine.
+
 ### Vagrant
 
 Clone this repository and run the following from the root directory of this repository:
