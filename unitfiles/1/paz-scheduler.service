@@ -6,6 +6,7 @@ After=fleet.service
 
 [Service]
 User=core
+EnvironmentFile=/etc/paz-environment
 Restart=always
 ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-scheduler:latest
 ExecStartPre=-/bin/bash -c "docker inspect paz-scheduler >/dev/null 2>&1 && docker rm -f paz-scheduler || true"
@@ -16,6 +17,7 @@ ExecStart=/bin/bash -c " \
   -e PAZ_SCHEDULER_SSH_HOST=$host_ip \
   -e PAZ_SCHEDULER_GEN_KEY=true \
   -e PAZ_SCHEDULER_ETCD_ENDPOINT=$host_ip:4001 \
+  -e PAZ_SCHEDULER_CORS=$PAZ_SCHEDULER_CORS \
   --name paz-scheduler \
   quay.io/yldio/paz-scheduler"
 ExecStop=/usr/bin/docker rm -f paz-scheduler
