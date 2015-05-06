@@ -13,6 +13,7 @@ ExecStart=/bin/bash -c " \
   /usr/bin/docker run -P \
     -e PAZ_ORCHESTRATOR_URL=paz-orchestrator.$domain \
     -e PAZ_ORCHESTRATOR_SOCKET=paz-orchestrator-socket.$domain \
+    -e PAZ_SCHEDULER_URL=paz-scheduler.$domain \
     --name paz-web \
     quay.io/yldio/paz-web"
 TimeoutStartSec=60m
