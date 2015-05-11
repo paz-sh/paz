@@ -45,7 +45,7 @@ createNewVagrantCluster() {
   cd coreos-vagrant
   DISCOVERY_TOKEN=`curl -s https://discovery.etcd.io/new` && perl -i -p -e "s@discovery: https://discovery.etcd.io/\w+@discovery: $DISCOVERY_TOKEN@g" user-data
   printDebug Using discovery token ${DISCOVERY_TOKEN}
-  perl -p -e 's/\#\$num_instances=1$/\$num_instances=3/g' config.rb.sample > config.rb
+  perl -p -e 's/\$num_instances=1/\$num_instances=3/g' config.rb.sample > config.rb
   perl -pi -e 's/alpha/beta/g' config.rb
   perl -pi -e 's/\#\$update_channel=/\$update_channel=/g' config.rb
   vagrant box update
