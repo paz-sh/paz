@@ -156,7 +156,7 @@ $ cd test
 $ ./integration.sh
 ```
 
-Each paz repository (service directory, orchestrator, scheduler) has tests that run on paz-ci.yld.io (in StriderCD), triggered by a Github webhook.
+Each paz repository (service directory, orchestrator, scheduler) has tests that run on http://paz-ci.yld.io:8080 (in StriderCD), triggered by a Github webhook.
 
 ## Paz Repositories
 
