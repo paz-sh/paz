@@ -18,6 +18,7 @@ checkDependencies
 
 destroyOldVagrantCluster
 
+set -e
 createNewVagrantCluster vagrant/user-data
 
 configureSSHAgent
@@ -28,6 +29,7 @@ printDebug ETCDCTL_CMD=${ETCDCTL_CMD}
 printDebug FLEETCTL_ENDPOINT=${FLEETCTL_ENDPOINT}
 
 # launch all base paz units except paz-web, and wait until announced
+set +e
 launchAndWaitForUnits 1 6
 waitForCoreServicesAnnounce
 
