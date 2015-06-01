@@ -146,7 +146,29 @@ Once they're up you can install the final services:
 ```
 $ FLEETCTL_TUNNEL=<MACHINE_IP> fleetctl -strict-host-key-checking=false start unitfiles/2/*
 ```
+### Bare Metal
 
+Paz works fine on a bare metal install, but there is no install script available for it yet.
+
+You need to create your cluster, then add the contents of bare_metal/user-data to your cloud config, and finally submit the unit files.
+
+1. Create your cluster.
+2. Paste the contents of bare_metal/user-data into your cloud config file. Be sure to alter the networking information to match your setup.
+3. Go to `http://discovery.etcd.io/new` and copy the URL that it prints in the browser, pasting it into the userdata text area instead of the one that is already there.
+4. Install Paz:
+```
+$ ssh-add ~/.ssh/id_rsa
+$ FLEETCTL_TUNNEL=<MACHINE_IP> fleetctl -strict-host-key-checking=false start unitfiles/1/*
+```
+...where `<MACHINE_IP>` is an IP address of any node in your cluster.
+You can wait for all units to be active/running like so:
+```
+$ FLEETCTL_TUNNEL=<MACHINE_IP> watch -n 5 fleetctl -strict-host-key-checking=false list-units
+```
+Once they're up you can install the final services:
+```
+$ FLEETCTL_TUNNEL=<MACHINE_IP> fleetctl -strict-host-key-checking=false start unitfiles/2/*
+```
 ## Tests
 
 There is an integration test that brings up a CoreOS Vagrant cluster, installs Paz and then runs a contrived service on it and verifies that it works:

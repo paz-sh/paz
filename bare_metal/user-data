@@ -1,0 +1,134 @@
+#cloud-config
+# assumptions:
+# local private IP for this machine is 10.0.1.23
+# gateway IP is 10.0.1.1
+coreos:
+  units:
+    - name: etcd.service
+      command: start
+    - name: fleet.service
+      command: start
+    - name: docker.service
+      drop-ins:
+        - name: 50-docker-dns.conf
+          content: |
+              [Service]
+              Environment='DOCKER_OPTS=--restart=false -D --dns=10.0.1.23 --dns=10.0.1.1'
+    - name: cadvisor.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=Analyzes resource usage and performance characteristics of running containers.
+        After=docker.service
+        Requires=docker.service
+
+        [Service]
+        Restart=always
+        ExecStartPre=/usr/bin/docker pull google/cadvisor:latest
+        ExecStartPre=-/bin/bash -c " \
+          docker inspect cadvisor >/dev/null 2>&1 \
+          && docker rm -f cadvisor || true"
+        ExecStart=/usr/bin/docker run --volume=/var/run:/var/run:rw --volume=/sys/fs/cgroup/:/sys/fs/cgroup:ro --volume=/var/lib/docker/:/var/lib/docker:ro --publish=8080:8080 --name=cadvisor google/cadvisor:latest
+        ExecStop=/usr/bin/docker rm -f cadvisor
+    - name: paz-dnsmasq.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=*.paz traffic will go to the private_ipv4 addr
+        After=docker.service
+        Requires=docker.service
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        Restart=always
+        ExecStartPre=/usr/bin/docker pull tomgco/dnsmasq-catch:latest
+        ExecStartPre=-/bin/bash -c " \
+          docker inspect paz-dnsmasq >/dev/null 2>&1 \
+          && docker rm -f paz-dnsmasq || true"
+        ExecStart=/usr/bin/docker run -p 10.0.1.23:53:53/udp --privileged --name=paz-dnsmasq tomgco/dnsmasq-catch paz 10.0.1.23
+        ExecStop=/usr/bin/docker rm -f paz-dnsmasq
+    - name: paz-haproxy.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=paz HAProxy instance that enables service discovery.
+        After=docker.service
+        Requires=docker.service
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        User=core
+        Restart=always
+        RestartSec=5s
+        ExecStartPre=/usr/bin/docker pull quay.io/yldio/paz-haproxy:latest
+        ExecStartPre=-/bin/bash -c " \
+          docker inspect paz-haproxy >/dev/null 2>&1 \
+          && docker rm -f paz-haproxy || true"
+        ExecStart=/usr/bin/docker run -p 80:80 -p 1936:1936 -e ETCD=10.0.1.23:2379 --name paz-haproxy quay.io/yldio/paz-haproxy
+        ExecStop=/usr/bin/docker rm -f paz-haproxy
+        TimeoutStartSec=20m
+    - name: paz-pubkey-watcher.service
+      runtime: true
+      command: start
+      content: |
+        [Unit]
+        Description=Watch etcd for scheduler public key changes and update authorized_hosts.
+
+        After=etcd.service
+        Requires=etcd.service
+        After=fleet.service
+        Requires=fleet.service
+
+        [Service]
+        User=core
+        Restart=always
+        ExecStartPre=/home/core/bin/paz-pubkey-watcher.sh once
+        ExecStart=/home/core/bin/paz-pubkey-watcher.sh
+  etcd:
+    name: hostname
+    addr: 10.0.1.23:4001
+    peer-addr: 10.0.1.23:7001
+    discovery: https://discovery.etcd.io/0fb290c2f54d9338f0abefe73745f8cd
+  fleet:
+    public-ip: 10.0.1.23
+    etcd_request_timeout: 5
+write_files:
+  - path: /etc/paz-environment
+    permissions: 0644
+    content: |
+        PAZ_PLATFORM=bare_metal
+        PAZ_DOMAIN=burntsheep.com
+        PAZ_ORCHESTRATOR_DNS_DISABLED=true
+        PAZ_ORCHESTRATOR_CORS=true
+  - path: /home/core/bin/paz-pubkey-watcher.sh
+    owner: core
+    permissions: 0754
+    content: |
+        #!/bin/bash
+        set -e
+        if [[ "$1" == "once" ]]; then
+          FN=`mktemp /tmp/paz-pubkey.XXXX`
+          until etcdctl get /paz/config/scheduler/_pubkey 2>/dev/null > $FN.tmp; do sleep 2; done && base64 -d < $FN.tmp > $FN && /usr/bin/update-ssh-keys -u core -a paz-scheduler $FN
+          rm $FN $FN.tmp
+        else
+          while :; do
+            FN=`mktemp /tmp/paz-pubkey.XXXX`
+            etcdctl watch /paz/config/scheduler/_pubkey | base64 -d > $FN && /usr/bin/update-ssh-keys -u core -a paz-scheduler $FN;
+            rm $FN
+          done;
+        fi
+  - path: /etc/environment
+    content: |
+        COREOS_PUBLIC_IPV4=10.0.1.23
+        COREOS_PRIVATE_IPV4=10.0.1.23
