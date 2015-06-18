@@ -12,19 +12,19 @@ checkDependencies() {
 }
 
 checkForVagrantCluster() {
-  [ -d "coreos-vagrant" ] || { echo >&2 "No extant Vagrant cluster"; exit 1; }
+  [ -d "paz-vagrant" ] || { echo >&2 "No extant Vagrant cluster"; exit 1; }
 }
 
 destroyOldVagrantCluster() {
   echo
   echo "Checking for existing Vagrant cluster"
-  if [ -d "coreos-vagrant" ]; then
+  if [ -d "paz-vagrant" ]; then
     echo "Deleting existing Vagrant cluster"
-    cd coreos-vagrant
+    cd paz-vagrant
     vagrant destroy -f
     cd ..
   fi
-  rm -rf coreos-vagrant 2>/dev/null
+  rm -rf paz-vagrant 2>/dev/null
 }
 
 destroyExistingUnits() {
@@ -41,9 +41,9 @@ createNewVagrantCluster() {
   set -x
   echo
   echo "Creating a new Vagrant cluster"
-  git clone https://github.com/coreos/coreos-vagrant/
-  cp $1 coreos-vagrant
-  cd coreos-vagrant
+  git clone https://github.com/paz-sh/paz-vagrant.git
+  cp $1 paz-vagrant
+  cd paz-vagrant
   DISCOVERY_TOKEN=`curl -s https://discovery.etcd.io/new` && perl -i -p -e "s@discovery: https://discovery.etcd.io/\w+@discovery: $DISCOVERY_TOKEN@g" user-data
   printDebug Using discovery token ${DISCOVERY_TOKEN}
   perl -p -e 's/\$num_instances=1/\$num_instances=3/g' config.rb.sample > config.rb
@@ -56,7 +56,7 @@ createNewVagrantCluster() {
   echo Waiting for Vagrant cluster to be ready...
   until $ETCDCTL_CMD ls >/dev/null 2>&1; do sleep 1; done
   cd ..
-  echo CoreOS Vagrant cluster is up
+  echo Paz Vagrant cluster is up
 }
 
 configureSSHAgent() {

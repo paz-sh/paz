@@ -99,7 +99,7 @@ $./script/reinstall-units-vagrant.sh
 To interact with the units in the cluster via Fleet, just specify the URL to Etcd on one of your hosts as a parameter to Fleet. e.g.:
 
 ```
-$ fleetctl -strict-host-key-checking=false -endpoint=http://172.17.8.101:4001 list-units
+$ fleetctl -strict-host-key-checking=false -endpoint=http://172.17.9.101:4001 list-units
 ```
 
 You can also SSH into one of the VMs and run `fleetctl` from there:

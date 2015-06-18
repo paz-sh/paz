@@ -29,7 +29,7 @@ createNewVagrantCluster ../vagrant/user-data
 copyDependencies
 configureSSHAgent
 
-ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
+ETCDCTL_CMD="etcdctl --peers=172.17.9.101:4001"
 export FLEETCTL_TUNNEL=127.0.0.1:2222
 
 set +e
@@ -45,10 +45,10 @@ launchAndWaitForUnits 2 8
 
 echo
 echo You will need to add the following entries to your /etc/hosts:
-echo   172.17.8.101 paz-web.paz
-echo   172.17.8.101 paz-scheduler.paz
-echo   172.17.8.101 paz-orchestrator.paz
-echo   172.17.8.101 paz-orchestrator-socket.paz
+echo   172.17.9.101 paz-web.paz
+echo   172.17.9.101 paz-scheduler.paz
+echo   172.17.9.101 paz-orchestrator.paz
+echo   172.17.9.101 paz-orchestrator-socket.paz
 
 echo
 echo Adding service to directory
@@ -83,4 +83,4 @@ echo "Test service \"demo-api\" is up"
 
 echo
 echo You will need to add the following entries to your /etc/hosts:
-echo   172.17.8.101 demo-api.paz
+echo   172.17.9.101 demo-api.paz

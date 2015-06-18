@@ -23,8 +23,8 @@ createNewVagrantCluster vagrant/user-data
 
 configureSSHAgent
 
-ETCDCTL_CMD="etcdctl --peers=172.17.8.101:4001"
-export FLEETCTL_ENDPOINT=http://172.17.8.101:4001
+ETCDCTL_CMD="etcdctl --peers=172.17.9.101:4001"
+export FLEETCTL_ENDPOINT=http://172.17.9.101:4001
 printDebug ETCDCTL_CMD=${ETCDCTL_CMD}
 printDebug FLEETCTL_ENDPOINT=${FLEETCTL_ENDPOINT}
 
@@ -40,10 +40,10 @@ launchAndWaitForUnits 2 8
 
 echo
 echo You will need to add the following entries to your /etc/hosts:
-echo   172.17.8.101 paz-web.paz
-echo   172.17.8.101 paz-scheduler.paz
-echo   172.17.8.101 paz-orchestrator.paz
-echo   172.17.8.101 paz-orchestrator-socket.paz
+echo   172.17.9.101 paz-web.paz
+echo   172.17.9.101 paz-scheduler.paz
+echo   172.17.9.101 paz-orchestrator.paz
+echo   172.17.9.101 paz-orchestrator-socket.paz
 
 echo
 echo Paz installation successful
