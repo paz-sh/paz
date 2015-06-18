@@ -38,7 +38,6 @@ destroyExistingUnits() {
 }
 
 createNewVagrantCluster() {
-  set -x
   echo
   echo "Creating a new Vagrant cluster"
   git clone https://github.com/paz-sh/paz-vagrant.git
@@ -46,11 +45,7 @@ createNewVagrantCluster() {
   cd paz-vagrant
   DISCOVERY_TOKEN=`curl -s https://discovery.etcd.io/new` && perl -i -p -e "s@discovery: https://discovery.etcd.io/\w+@discovery: $DISCOVERY_TOKEN@g" user-data
   printDebug Using discovery token ${DISCOVERY_TOKEN}
-  perl -p -e 's/\$num_instances=1/\$num_instances=3/g' config.rb.sample > config.rb
-  perl -pi -e 's/alpha/beta/g' config.rb
-  perl -pi -e 's/\#\$update_channel=/\$update_channel=/g' config.rb
-  # enforce temporary manual version update 
-  perl -pi -e 's/amd64-usr\/current\/coreos_production_vagrant/amd64-usr\/695.0.0\/coreos_production_vagrant/g' config.rb
+  cp config.rb.sample config.rb
   vagrant box update
   vagrant up
   echo Waiting for Vagrant cluster to be ready...
