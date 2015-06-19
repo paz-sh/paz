@@ -52,6 +52,7 @@ createNewVagrantCluster() {
   until $ETCDCTL_CMD ls >/dev/null 2>&1; do sleep 1; done
   cd ..
   echo Paz Vagrant cluster is up
+  sleep 5
 }
 
 configureSSHAgent() {
@@ -77,9 +78,10 @@ launchAndWaitForUnits() {
   ACTIVE_COUNT=0
   DOT_COUNTER=1
   until [ "$ACTIVE_COUNT" == "$UNIT_COUNT" ]; do
-    ACTIVATING_COUNT=$(fleetctl -strict-host-key-checking=false list-units 2>/dev/null | grep "\.service" | awk '{print $3}' | grep -c "activating")
-    ACTIVE_COUNT=$(fleetctl -strict-host-key-checking=false list-units 2>/dev/null | grep "\.service" | awk '{print $3}' | grep -c "active")
-    FAILED_COUNT=$(fleetctl -strict-host-key-checking=false list-units 2>/dev/null | grep "\.service" | awk '{print $3}' | grep -c "failed")
+    local UNIT_STATUS=$(fleetctl -strict-host-key-checking=false list-units 2>/dev/null)
+    ACTIVATING_COUNT=$(echo "${UNIT_STATUS}" | grep "\.service" | awk '{print $3}' | grep -c "activating")
+    ACTIVE_COUNT=$(echo "${UNIT_STATUS}" | grep "\.service" | awk '{print $3}' | grep -c "active")
+    FAILED_COUNT=$(echo "${UNIT_STATUS}" | grep "\.service" | awk '{print $3}' | grep -c "failed")
     echo -n $'\r'Activating: $ACTIVATING_COUNT \| Active: $ACTIVE_COUNT \| Failed: $FAILED_COUNT 
     for (( c=1; c<=$DOT_COUNTER; c++ )); do echo -n .; done
     for (( c=3; c>$DOT_COUNTER; c-- )); do echo -n " "; done
