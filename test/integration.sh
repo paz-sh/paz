@@ -29,7 +29,7 @@ createNewVagrantCluster ../vagrant/user-data
 copyDependencies
 configureSSHAgent
 
-ETCDCTL_CMD="etcdctl --peers=172.17.9.101:4001"
+ETCDCTL_CMD="etcdctl --peers=172.17.9.101:2379"
 export FLEETCTL_TUNNEL=127.0.0.1:2222
 
 set +e

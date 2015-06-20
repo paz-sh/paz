@@ -17,8 +17,8 @@ checkForVagrantCluster
 
 configureSSHAgent
 
-ETCDCTL_CMD="etcdctl --peers=172.17.9.101:4001"
-export FLEETCTL_ENDPOINT=http://172.17.9.101:4001
+ETCDCTL_CMD="etcdctl --peers=172.17.9.101:2379"
+export FLEETCTL_ENDPOINT=http://172.17.9.101:2379
 printDebug ETCDCTL_CMD=${ETCDCTL_CMD}
 printDebug FLEETCTL_ENDPOINT=${FLEETCTL_ENDPOINT}
 
