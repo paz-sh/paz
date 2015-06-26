@@ -2,8 +2,8 @@
 Description=paz-orchestrator: Main API for all paz services and monitor of services in etcd.
 After=docker.service
 Requires=docker.service
-After=etcd.service
-Requires=etcd.service
+After=etcd2.service
+Requires=etcd2.service
 
 [Service]
 User=core

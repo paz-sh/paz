@@ -4,7 +4,7 @@
 # gateway IP is 10.0.1.1
 coreos:
   units:
-    - name: etcd.service
+    - name: etcd2.service
       command: start
     - name: fleet.service
       command: start
@@ -40,8 +40,8 @@ coreos:
         After=docker.service
         Requires=docker.service
 
-        After=etcd.service
-        Requires=etcd.service
+        After=etcd2.service
+        Requires=etcd2.service
         After=fleet.service
         Requires=fleet.service
 
@@ -62,8 +62,8 @@ coreos:
         After=docker.service
         Requires=docker.service
 
-        After=etcd.service
-        Requires=etcd.service
+        After=etcd2.service
+        Requires=etcd2.service
         After=fleet.service
         Requires=fleet.service
 
@@ -85,8 +85,8 @@ coreos:
         [Unit]
         Description=Watch etcd for scheduler public key changes and update authorized_hosts.
 
-        After=etcd.service
-        Requires=etcd.service
+        After=etcd2.service
+        Requires=etcd2.service
         After=fleet.service
         Requires=fleet.service
 

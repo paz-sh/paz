@@ -3,8 +3,8 @@ Description=paz-orchestrator announce
 BindsTo=paz-orchestrator.service
 After=docker.service
 Requires=docker.service
-After=etcd.service
-Requires=etcd.service
+After=etcd2.service
+Requires=etcd2.service
 After=fleet.service
 
 [Service]

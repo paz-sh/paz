@@ -3,7 +3,7 @@ Description=paz-web announce
 BindsTo=paz-web.service
 After=docker.service
 Requires=docker.service
-After=etcd.service
+After=etcd2.service
 
 [Service]
 User=core

@@ -2,7 +2,7 @@
 Description=A catalog of services with versioned config for running as Docker containers with systemd
 After=docker.service
 Requires=docker.service
-After=etcd.service
+After=etcd2.service
 
 [Service]
 User=core
