@@ -53,7 +53,7 @@ echo   172.17.9.101 paz-orchestrator-socket.paz
 echo
 echo Adding service to directory
 # XXX if it fails (e.g. 503) then it doesn't realise
-SVCDOC='{"name":"demo-api","description":"Very simple HTTP Hello World server","dockerRepository":"lukebond/demo-api","numInstances":3,"publicFacing":false}'
+SVCDOC='{"name":"demo-api","description":"Very simple HTTP Hello World server","dockerRepository":"quay.io/lukebond/demo-api","numInstances":3,"publicFacing":false}'
 ORCHESTRATOR_URL=$($ETCDCTL_CMD get /paz/services/paz-orchestrator)
 until curl -sf -XPOST -H "Content-Type: application/json" -d "$SVCDOC" $ORCHESTRATOR_URL/services; do
   sleep 2
