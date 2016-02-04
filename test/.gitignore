@@ -1,5 +1,6 @@
 unitfiles
 scripts
 coreos-vagrant
+paz-vagrant
 config.rb
 .install-temp
