@@ -93,7 +93,7 @@ For extra debug output, run with `DEBUG=1` environment variable set.
 If you already have a Vagrant cluster running and want to reinstall the units, use:
 
 ```
-$./script/reinstall-units-vagrant.sh
+$./scripts/reinstall-units-vagrant.sh
 ```
 
 To interact with the units in the cluster via Fleet, just specify the URL to Etcd on one of your hosts as a parameter to Fleet. e.g.:
