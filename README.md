@@ -4,6 +4,8 @@ Paz
 ===
 _Continuous deployment production environments, built on Docker, CoreOS, etcd and fleet._
 
+**THIS PROJECT IS INACTIVE**
+
 Paz is an in-house service platform with a PaaS-like workflow.
 
 Paz's documentation can be found [here](http://paz.readme.io).
